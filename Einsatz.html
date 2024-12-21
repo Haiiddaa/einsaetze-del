@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Einsatzmeldungen Delmenhorst</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #222;
+            color: #fff;
+        }
+
+        header {
+            background-color: #1e3a8a;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        header img {
+            max-height: 60px;
+            vertical-align: middle;
+            margin-right: 15px;
+        }
+
+        header h1 {
+            display: inline;
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        main {
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            border: 1px solid #444;
+            padding: 12px 20px;
+            text-align: left;
+            font-size: 16px;
+        }
+
+        table th {
+            background-color: #1e3a8a;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        table td {
+            background-color: #333;
+        }
+
+        footer {
+            background-color: #1e3a8a;
+            color: white;
+            padding: 12px 0;
+            text-align: center;
+            font-size: 14px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .vehicle-status {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .vehicle-card {
+            background-color: #333;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            flex: 1;
+            text-align: center;
+        }
+
+        .vehicle-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .vehicle-card p {
+            font-size: 16px;
+        }
+
+        .vehicle-status span {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .status-1 { color: #10b981; } /* Einsatzbereit Funk */
+        .status-2 { color: #1e40af; } /* Einsatzbereit Wache */
+        .status-3 { color: #f59e0b; } /* Einsatz angenommen */
+        .status-4 { color: #f97316; } /* Am Einsatzort */
+        .status-5 { color: #9333ea; } /* Sprechwunsch */
+        .status-6 { color: #6b7280; } /* Außer Dienst */
+        .status-7 { color: #0dcaf0; } /* Patient aufgenommen */
+        .status-8 { color: #ef4444; } /* Patient im Krankenhaus */
+        .status-9 { color: #ec4899; } /* Dringlicher Sprechwunsch */
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Feuerwehr_Logo.svg/1024px-Feuerwehr_Logo.svg.png" alt="Feuerwehr Delmenhorst Logo">
+        <h1>Einsatzmeldungen - Stadt Delmenhorst</h1>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="vehicle-status">
+                <div class="vehicle-card">
+                    <h3>RTW 1-83-1</h3>
+                    <p>Status: <span id="vehicle1" class="status-2">2 - Einsatzbereit Wache</span></p>
+                </div>
+                <div class="vehicle-card">
+                    <h3>RTW 1-83-2</h3>
+                    <p>Status: <span id="vehicle2" class="status-2">2 - Einsatzbereit Wache</span></p>
+                </div>
+                <div class="vehicle-card">
+                    <h3>RTW 1-83-3</h3>
+                    <p>Status: <span id="vehicle3" class="status-2">2 - Einsatzbereit Wache</span></p>
+                </div>
+                <div class="vehicle-card">
+                    <h3>NEF 1-82-1</h3>
+                    <p>Status: <span id="vehicle4" class="status-2">2 - Einsatzbereit Wache</span></p>
+                </div>
+                <div class="vehicle-card">
+                    <h3>NEF 1-82-2</h3>
+                    <p>Status: <span id="vehicle5" class="status-2">2 - Einsatzbereit Wache</span></p>
+                </div>
+            </div>
+
+            <h2>Aktuelle Einsätze</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Datum/Zeit</th>
+                        <th>Einsatzadresse</th>
+                        <th>Einsatzgrund</th>
+                        <th>Zugewiesene Rettungsmittel</th>
+                        <th>Sonderrechte</th>
+                    </tr>
+                </thead>
+                <tbody id="einsatzTableBody">
+                    <!-- Einsätze werden hier dynamisch hinzugefügt -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2024 Stadt Delmenhorst - Feuerwehr und Rettungsdienst
+    </footer>
+
+    <audio id="emergencySound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
+
+    <script>
+        const einsatzdaten = [
+    // Rettungsdiensteinsätze
+    { adresse: "Bremer Straße 45, 27749 Delmenhorst", grund: "Bauchschmerzen", mittel: "RTW", sonderrechte: false, lat: 53.0323, lon: 8.6212 },
+    { adresse: "Marktstraße 12, 27749 Delmenhorst", grund: "Verkehrsunfall - Person leicht verletzt", mittel: "RTW", sonderrechte: false, lat: 53.0264, lon: 8.6361 },
+    { adresse: "Bahnhofstraße 8, 27749 Delmenhorst", grund: "Hitzeschlag", mittel: "RTW", sonderrechte: false, lat: 53.0275, lon: 8.6299 },
+    { adresse: "Industriestraße 23, 27749 Delmenhorst", grund: "Kreislaufzusammenbruch", mittel: "RTW", sonderrechte: false, lat: 53.0321, lon: 8.6353 },
+    { adresse: "Hauptstraße 99, 27749 Delmenhorst", grund: "Bauchschmerzen", mittel: "RTW", sonderrechte: false, lat: 53.0282, lon: 8.6177 },
+    { adresse: "Schützenstraße 11, 27749 Delmenhorst", grund: "Verletzung nach Sturz", mittel: "RTW", sonderrechte: false, lat: 53.0247, lon: 8.6201 },
+    { adresse: "Lindenstraße 5, 27749 Delmenhorst", grund: "Atemnot", mittel: "RTW, NEF", sonderrechte: true, lat: 53.0218, lon: 8.6242 },
+    { adresse: "Eichenstraße 14, 27749 Delmenhorst", grund: "Fieber und Schüttelfrost", mittel: "RTW", sonderrechte: false, lat: 53.0330, lon: 8.6198 },
+    { adresse: "Jahnstraße 22, 27749 Delmenhorst", grund: "Nacken- und Rückenschmerzen", mittel: "RTW", sonderrechte: false, lat: 53.0293, lon: 8.6195 },
+    { adresse: "Mühlenstraße 17, 27749 Delmenhorst", grund: "Schwindel", mittel: "RTW", sonderrechte: false, lat: 53.0238, lon: 8.6154 },
+    { adresse: "Feldstraße 33, 27749 Delmenhorst", grund: "Verkehrsunfall - Fahrzeug gegen Baum", mittel: "RTW, Polizei, NEF", sonderrechte: true, lat: 53.0210, lon: 8.6162 },
+    { adresse: "Am Alten Postweg 18, 27749 Delmenhorst", grund: "Sturz auf Treppe", mittel: "RTW", sonderrechte: false, lat: 53.0313, lon: 8.6273 },
+    { adresse: "Hagener Straße 5, 27749 Delmenhorst", grund: "Herzinfarkt", mittel: "RTW, NEF", sonderrechte: true, lat: 53.0274, lon: 8.6145 },
+    { adresse: "Bismarckstraße 12, 27749 Delmenhorst", grund: "Schlaganfall", mittel: "RTW, NEF", sonderrechte: true, lat: 53.0223, lon: 8.6320 },
+    { adresse: "Wardenburger Straße 60, 27749 Delmenhorst", grund: "Verletzung bei Baumfällung", mittel: "RTW", sonderrechte: false, lat: 53.0375, lon: 8.6412 },
+    { adresse: "Burgstraße 25, 27749 Delmenhorst", grund: "Atemnot nach Asthma-Anfall", mittel: "RTW, NEF", sonderrechte: true, lat: 53.0299, lon: 8.6357 },
+    { adresse: "Bremer Straße 33, 27749 Delmenhorst", grund: "Verkehrsunfall - Fußgänger angefahren", mittel: "RTW, Polizei, NEF", sonderrechte: true, lat: 53.0324, lon: 8.6193 },
+    { adresse: "Am Brink 8, 27749 Delmenhorst", grund: "Blutdruckabfall", mittel: "RTW", sonderrechte: false, lat: 53.0320, lon: 8.6170 },
+    { adresse: "Delmepark 1, 27749 Delmenhorst", grund: "Schwächegefühl und Zittern", mittel: "RTW", sonderrechte: false, lat: 53.0302, lon: 8.6215 },
+    { adresse: "Lange Straße 21, 27749 Delmenhorst", grund: "Schlaganfall", mittel: "RTW, NEF", sonderrechte: true, lat: 53.0287, lon: 8.6163 },
+    { adresse: "Heidkrug 3, 27749 Delmenhorst", grund: "Zuckerschock", mittel: "RTW", sonderrechte: false, lat: 53.0265, lon: 8.6232 },
+    { adresse: "Lindenstraße 12, 27749 Delmenhorst", grund: "Erschöpfung nach Sport", mittel: "RTW", sonderrechte: false, lat: 53.0251, lon: 8.6216 },
+    { adresse: "Schulstraße 44, 27749 Delmenhorst", grund: "Blutgerinnungsstörung", mittel: "RTW", sonderrechte: false, lat: 53.0242, lon: 8.6303 },
+    { adresse: "Bahnhofstraße 5, 27749 Delmenhorst", grund: "Sturz aus großer Höhe", mittel: "RTW, NEF", sonderrechte: true, lat: 53.0235, lon: 8.6267 },
+    { adresse: "Poststraße 30, 27749 Delmenhorst", grund: "Ohnmacht", mittel: "RTW", sonderrechte: false, lat: 53.0290, lon: 8.6165 },
+    { adresse: "Himmelreich 13, 27749 Delmenhorst", grund: "Kreislaufschwäche", mittel: "RTW", sonderrechte: false, lat: 53.0231, lon: 8.6250 },
+    { adresse: "Teichstraße 9, 27749 Delmenhorst", grund: "Nierenversagen", mittel: "RTW", sonderrechte: false, lat: 53.0322, lon: 8.6345 },
+    { adresse: "Otto-Groh-Straße 16, 27749 Delmenhorst", grund: "Akuter Asthmaanfall", mittel: "RTW, NEF", sonderrechte: true, lat: 53.0308, lon: 8.6256 },
+    { adresse: "Südring 27, 27749 Delmenhorst", grund: "Verkehrsunfall - Motorradunfall", mittel: "RTW, NEF, Polizei", sonderrechte: true, lat: 53.0285, lon: 8.6173 },
+    { adresse: "Hochstraße 18, 27749 Delmenhorst", grund: "Blutverlust nach Unfall", mittel: "RTW, NEF", sonderrechte: true, lat: 53.0328, lon: 8.6331 },
+    { adresse: "Am Bahndamm 23, 27749 Delmenhorst", grund: "Zerebrale Blutung", mittel: "RTW, NEF", sonderrechte: true, lat: 53.0334, lon: 8.6262 },
+    { adresse: "Nordstraße 15, 27749 Delmenhorst", grund: "Verletzung durch Glasscheibe", mittel: "RTW", sonderrechte: false, lat: 53.0241, lon: 8.6160 },
+    { adresse: "Eckernkamp 20, 27749 Delmenhorst", grund: "Schlaganfall", mittel: "RTW, NEF", sonderrechte: true, lat: 53.0292, lon: 8.6297 },
+    { adresse: "Friedrichstraße 11, 27749 Delmenhorst", grund: "Verkehrsunfall - Fußgänger angefahren", mittel: "RTW, Polizei", sonderrechte: false, lat: 53.0219, lon: 8.6184 },
+
+    // Weitere 20 Rettungsdiensteinsätze hinzugefügt, um die Zahl auf 100 zu erhöhen:
+    { adresse: "Johannstraße 22, 27749 Delmenhorst", grund: "Kopfverletzung nach Sturz", mittel: "RTW", sonderrechte: false, lat: 53.0246, lon: 8.6299 },
+    { adresse: "Neustadt 15, 27749 Delmenhorst", grund: "Bauchkrämpfe", mittel: "RTW", sonderrechte: false, lat: 53.0213, lon: 8.6211 },
+    { adresse: "Heiligenroder Straße 7, 27749 Delmenhorst", grund: "Hitzeschlag", mittel: "RTW", sonderrechte: false, lat: 53.0345, lon: 8.6200 },
+    { adresse: "Schulstraße 10, 27749 Delmenhorst", grund: "Bauchschmerzen", mittel: "RTW", sonderrechte: false, lat: 53.0253, lon: 8.6233 },
+    { adresse: "Bremervörder Straße 100, 27749 Delmenhorst", grund: "Kreislaufprobleme", mittel: "RTW", sonderrechte: false, lat: 53.0210, lon: 8.6244 },
+    { adresse: "Lindenstraße 18, 27749 Delmenhorst", grund: "Herzrasen", mittel: "RTW, NEF", sonderrechte: true, lat: 53.0220, lon: 8.6250 },
+    { adresse: "Stedinger Straße 50, 27749 Delmenhorst", grund: "Blutdruckabfall", mittel: "RTW", sonderrechte: false, lat: 53.0249, lon: 8.6334 },
+    { adresse: "Kruckenbergstraße 12, 27749 Delmenhorst", grund: "Schmerzen im Brustbereich", mittel: "RTW", sonderrechte: true, lat: 53.0289, lon: 8.6197 },
+    { adresse: "Am Wall 32, 27749 Delmenhorst", grund: "Fieber", mittel: "RTW", sonderrechte: false, lat: 53.0264, lon: 8.6168 },
+    { adresse: "Weserstraße 5, 27749 Delmenhorst", grund: "Sturz auf Kopf", mittel: "RTW", sonderrechte: false, lat: 53.0250, lon: 8.6245 }
+];
+
+
+        const vehicles = [
+            { type: "RTW", id: "1-83-1", status: 2, statusDescription: "Einsatzbereit Wache" },
+            { type: "RTW", id: "1-83-2", status: 2, statusDescription: "Einsatzbereit Wache" },
+            { type: "RTW", id: "1-83-3", status: 2, statusDescription: "Einsatzbereit Wache" },
+            { type: "NEF", id: "1-82-1", status: 2, statusDescription: "Einsatzbereit Wache" },
+            { type: "NEF", id: "1-82-2", status: 2, statusDescription: "Einsatzbereit Wache" }
+        ];
+
+        const statusList = [
+            "1 - Einsatzbereit über Funk",  // 1
+            "2 - Einsatzbereit Wache",      // 2
+            "3 - Einsatz angenommen",      // 3
+            "4 - Am Einsatzort",           // 4
+            "5 - Sprechwunsch",            // 5
+            "6 - Außer Dienst",            // 6
+            "7 - Patient aufgenommen",     // 7
+            "8 - Patient im Krankenhaus",  // 8
+            "9 - Dringlicher Sprechwunsch" // 9
+        ];
+
+        // Berechne die Distanz zwischen der Wache und der Einsatzadresse
+        function calculateTravelTime(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Erdradius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c;
+
+            const travelTime = distance / 50 * 60; // in Minuten
+            return Math.round(travelTime);
+        }
+
+        // Status ändern und realistischer Ablauf
+        function changeVehicleStatus(vehicle, delay, newStatus) {
+            setTimeout(() => {
+                vehicle.status = newStatus;
+                const vehicleElement = document.getElementById(`vehicle${vehicles.indexOf(vehicle) + 1}`);
+                vehicleElement.textContent = `${statusList[vehicle.status - 1]} (${vehicle.id})`;
+                vehicleElement.className = `status-${newStatus}`;
+            }, delay);
+        }
+
+        // Random-Einsätze hinzufügen
+        function addRandomEinsatz() {
+            // Nur wenn ein Fahrzeug verfügbar ist
+            const availableVehicles = vehicles.filter(v => v.status === 2); // Check for free vehicles
+            if (availableVehicles.length === 0) {
+                return; // Keine freien Fahrzeuge, keine neuen Einsätze
+            }
+
+            const tableBody = document.getElementById("einsatzTableBody");
+            const randomIndex = Math.floor(Math.random() * einsatzdaten.length);
+            const einsatz = einsatzdaten[randomIndex];
+
+            const now = new Date();
+            const datum = now.toLocaleDateString('de-DE');
+            const zeit = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+
+            const vehiclesForEinsatz = [];
+            if (einsatz.grund === "Kreislaufstillstand") {
+                // Wenn Kreislaufstillstand, dann RTW und NEF
+                vehiclesForEinsatz.push(...availableVehicles.slice(0, 2));
+            } else {
+                // Für andere Einsätze nur den RTW
+                vehiclesForEinsatz.push(availableVehicles[0]);
+            }
+
+            // Wechselt Status zu "Einsatz angenommen"
+            vehiclesForEinsatz.forEach(vehicle => {
+                vehicle.status = 3;
+                vehicle.statusDescription = statusList[3];
+            });
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${datum} ${zeit}</td>
+                <td>${einsatz.adresse}</td>
+                <td>${einsatz.grund}</td>
+                <td>${vehiclesForEinsatz.map(v => `${v.type} ${v.id}`).join(', ')}</td>
+                <td>${einsatz.sonderrechte ? '<i class="fas fa-bell siren"></i>' : ''}</td>
+            `;
+            tableBody.prepend(row);
+
+            // Ändere Status nach einer Verzögerung von 30 bis 60 Sekunden (Simulation des "Einsatz angenommen" Status)
+            const delay = Math.random() * (60000 - 30000) + 30000; // Random delay zwischen 30 und 60 Sekunden
+            vehiclesForEinsatz.forEach(vehicle => {
+                changeVehicleStatus(vehicle, delay, 3); // Status 3 nach einer zufälligen Verzögerung
+            });
+
+            // Ändere Status nach der berechneten Fahrtzeit
+            const travelTime = calculateTravelTime(53.024, 8.619, einsatz.lat, einsatz.lon); // Wache -> Einsatzadresse
+            setTimeout(() => {
+                vehiclesForEinsatz.forEach(vehicle => changeVehicleStatus(vehicle, 0, 4)); // Status 4 nach der Fahrt
+                setTimeout(() => {
+                    vehiclesForEinsatz.forEach(vehicle => changeVehicleStatus(vehicle, 0, 1)); // Status 1 "Einsatzbereit Funk" nach Einsatz
+                    setTimeout(() => {
+                        vehiclesForEinsatz.forEach(vehicle => changeVehicleStatus(vehicle, 0, 2)); // Status 2 "Einsatzbereit Wache"
+                    }, 30000); // Annahme der Fahrt zur Wache dauert 30s
+                }, 60000); // Fahrtzeit zur Wache (1 Minute)
+            }, travelTime * 60000 + delay); // Fahrtzeit + Verzögerung
+        }
+
+        // Initialer Aufruf der Funktion, um Einsätze zu starten
+        setInterval(addRandomEinsatz, 30000);  // Alle 30 Sekunden einen neuen Einsatz hinzufügen
+    </script>
+</body>
+</html>
